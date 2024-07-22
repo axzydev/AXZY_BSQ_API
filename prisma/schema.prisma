@@ -1,0 +1,61 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Client {
+    id   Int    @id @default(autoincrement())
+    uuid String @unique @default(cuid())
+
+    name        String
+    phoneNumber String
+    email       String
+    rfc         String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    active    Boolean  @default(true)
+
+    payments Payment[]
+}
+
+model Payment {
+    id   Int    @id @default(autoincrement())
+    uuid String @unique @default(cuid())
+
+    invoiceDate       DateTime
+    invoiceNumber     String
+    total             Float
+    subTotal          Float
+    paid              Float
+    invoiceExpiration DateTime?
+    pdfUrl            String?
+    xmlUrl            String?
+    hasFiles          Boolean   @default(false)
+    createdAt         DateTime  @default(now())
+    updatedAt         DateTime  @updatedAt
+    active            Boolean   @default(true)
+
+    clientId      Int
+    client        Client          @relation(fields: [clientId], references: [id])
+    paymentDetail PaymentDetail[]
+}
+
+model PaymentDetail {
+    id   Int    @id @default(autoincrement())
+    uuid String @unique @default(cuid())
+
+    concept String
+    amount  Float
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    active    Boolean  @default(true)
+
+    paymentId Int
+    payment   Payment @relation(fields: [paymentId], references: [id])
+}

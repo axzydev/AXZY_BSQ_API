@@ -1,0 +1,31 @@
+openapi: 3.0.3
+info:
+  title: AXZY REHAB API
+  description: REHAB API
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000
+    description: Local server
+tags:
+  - name: index
+    description: Operations about index
+paths:
+  /api/v1/:
+    get:
+      tags:
+        - index
+      summary: Get index
+      operationId: getIndex
+      responses:
+        "200":
+          description: Index
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+#schemas
+#components:
+#  schemas:
