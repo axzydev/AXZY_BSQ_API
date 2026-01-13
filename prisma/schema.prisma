@@ -20,6 +20,7 @@ model User {
   children     Child[]
   appointments Appointment[]
   daySchedules DaySchedule[]
+  evaluations  Evaluation[]
 }
 
 enum Role {
@@ -78,4 +79,88 @@ model Child {
 
   user         User          @relation(fields: [userId], references: [id])
   appointments Appointment[]
+  evaluations  Evaluation[]
+}
+
+// ---------------------------
+//  EVALUATIONS MODULE
+// ---------------------------
+
+model Evaluation {
+  id       Int      @id @default(autoincrement())
+  childId  Int
+  coachId  Int
+  date     DateTime @default(now())
+  age      Int?
+  category String? // Infantil, Juvenil, etc
+  notes    String? // Observaciones generales del coach
+
+  child Child @relation(fields: [childId], references: [id])
+  coach User  @relation(fields: [coachId], references: [id])
+
+  swingMetrics     SwingMetric[]
+  technicalRatings TechnicalRating[]
+  developmentLogs  DevelopmentLog[]
+
+  createdAt DateTime @default(now())
+}
+
+enum SwingLevel {
+  BASE
+  OPTIMO
+  ELITE
+}
+
+model SwingMetric {
+  id           Int        @id @default(autoincrement())
+  evaluationId Int
+  level        SwingLevel
+  speedMph     Float
+
+  evaluation Evaluation @relation(fields: [evaluationId], references: [id])
+
+  @@unique([evaluationId, level])
+}
+
+model TechnicalArea {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  ratings TechnicalRating[]
+}
+
+enum TechnicalLevel {
+  BAJO
+  MEDIO
+  ALTO
+}
+
+enum ProgressIndicator {
+  PROGRESO
+  ESTABLE
+  ATENCION
+}
+
+model TechnicalRating {
+  id           Int               @id @default(autoincrement())
+  evaluationId Int
+  areaId       Int
+  level        TechnicalLevel
+  indicator    ProgressIndicator
+
+  evaluation Evaluation    @relation(fields: [evaluationId], references: [id])
+  area       TechnicalArea @relation(fields: [areaId], references: [id])
+
+  @@unique([evaluationId, areaId])
+}
+
+model DevelopmentLog {
+  id           Int               @id @default(autoincrement())
+  evaluationId Int
+  date         DateTime
+  age          Int?
+  comments     String
+  indicator    ProgressIndicator
+
+  evaluation Evaluation @relation(fields: [evaluationId], references: [id])
 }

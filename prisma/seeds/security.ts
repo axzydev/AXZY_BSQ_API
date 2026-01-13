@@ -80,6 +80,7 @@ const childrenSeed = async (
     create: {
       name: "Daniel Jacobo",
       userId: user1Id,
+      birthDate: new Date("2002-07-07"),
     },
   });
 
@@ -90,6 +91,7 @@ const childrenSeed = async (
     create: {
       name: "Ximena Ávila",
       userId: user2Id,
+      birthDate: new Date("2010-03-15"),
     },
   });
 
@@ -99,6 +101,7 @@ const childrenSeed = async (
     create: {
       name: "Said Martínez",
       userId: user2Id,
+      birthDate: new Date("2008-11-22"),
     },
   });
 };

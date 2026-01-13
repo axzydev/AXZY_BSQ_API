@@ -8,6 +8,7 @@ import dayScheduleRoute from "./daySchedule/daySchedule.routes";
 import appointmentRoute from "./appointment/appointment.routes";
 import childrenRoute from "./children/children.routes";
 import paymentsRoute from "./payments/payments.routes";
+import evaluationsRoute from "./evaluations/evaluations.routes";
 
 const apiRouter = Router();
 
@@ -18,4 +19,5 @@ apiRouter.use("/day-schedule", dayScheduleRoute);
 apiRouter.use("/appointments", appointmentRoute);
 apiRouter.use("/children", childrenRoute);
 apiRouter.use("/payments", paymentsRoute);
+apiRouter.use("/evaluations", evaluationsRoute);
 export default apiRouter;
