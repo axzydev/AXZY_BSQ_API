@@ -9,6 +9,7 @@ import appointmentRoute from "./appointment/appointment.routes";
 import childrenRoute from "./children/children.routes";
 import paymentsRoute from "./payments/payments.routes";
 import evaluationsRoute from "./evaluations/evaluations.routes";
+import notificationRoute from "./notification/notification.routes";
 
 const apiRouter = Router();
 
@@ -20,4 +21,5 @@ apiRouter.use("/appointments", appointmentRoute);
 apiRouter.use("/children", childrenRoute);
 apiRouter.use("/payments", paymentsRoute);
 apiRouter.use("/evaluations", evaluationsRoute);
+apiRouter.use("/notifications", notificationRoute);
 export default apiRouter;

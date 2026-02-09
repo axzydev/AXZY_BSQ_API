@@ -31,6 +31,6 @@ COPY --from=builder /app/swagger.yaml ./
 COPY --from=builder /app/.env ./
 COPY --from=builder /app/dist ./dist
 
-EXPOSE 4321
+EXPOSE 4444
 
 CMD ["node", "dist/src/index.js"]

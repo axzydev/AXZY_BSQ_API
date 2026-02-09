@@ -1,5 +1,5 @@
 import { PrismaClient, DaySchedule } from "@prisma/client";
-import { startOfWeek, endOfWeek } from "date-fns";
+import { startOfWeek, endOfWeek, addDays, isAfter } from "date-fns";
 
 const prisma = new PrismaClient();
 
@@ -31,7 +31,46 @@ export const getById = async (id: number): Promise<DaySchedule | null> => {
 };
 
 // CREATE
-export const create = async (data: any): Promise<DaySchedule> => {
+export const create = async (data: any): Promise<DaySchedule | DaySchedule[]> => {
+  if (data.recurrence) {
+    const { days, until } = data.recurrence;
+    const created: Promise<DaySchedule>[] = [];
+    
+    let current = new Date(data.date);
+    const endDate = new Date(until);
+    const baseStart = new Date(data.startTime);
+    const baseEnd = new Date(data.endTime);
+
+    // If 'until' is invalid or before start, just create single? 
+    // Assuming valid input for now.
+
+    while (!isAfter(current, endDate)) {
+       // days is array of numbers 0-6 (Sun-Sat)
+       // getDay() returns 0-6
+       if (days.includes(current.getDay())) {
+          const start = new Date(current);
+          start.setHours(baseStart.getHours(), baseStart.getMinutes(), 0, 0);
+          
+          const end = new Date(current);
+          end.setHours(baseEnd.getHours(), baseEnd.getMinutes(), 0, 0);
+
+          created.push(prisma.daySchedule.create({
+             data: {
+                date: new Date(current),
+                startTime: start,
+                endTime: end,
+                capacity: data.capacity,
+                modeId: data.modeId,
+                coachId: data.coachId
+             }
+          }));
+       }
+       current = addDays(current, 1);
+    }
+    const results = await Promise.all(created);
+    return results; // Returns array
+  }
+
   return prisma.daySchedule.create({
     data: {
       date: new Date(data.date),

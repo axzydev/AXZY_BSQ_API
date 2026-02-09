@@ -28,6 +28,7 @@ export const remove = (id: number) => {
 
 export const getAll = () => {
   return prisma.child.findMany({
+    include: { appointments: true },
     orderBy: { name: "asc" },
   });
 };
@@ -35,6 +36,7 @@ export const getAll = () => {
 export const getById = (id: number) => {
   return prisma.child.findUnique({
     where: { id },
+    include: { appointments: true },
   });
 };
 

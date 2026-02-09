@@ -3,6 +3,7 @@ import {
   getAllAppointments,
   getAppointmentById,
   createAppointment,
+  updateAppointment,
   deleteAppointment,
   getAppointmentsByDate,
   getAppointmentsBySchedule,
@@ -17,6 +18,7 @@ const router = Router();
 router.get("/", getAllAppointments);
 router.get("/:id", getAppointmentById);
 router.post("/", createAppointment);
+router.put("/:id", updateAppointment);
 router.delete("/:id", deleteAppointment);
 
 // Filters

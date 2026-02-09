@@ -3,6 +3,7 @@ import {
   get,
   getById,
   create,
+  update, // Imported
   remove,
   getByDate,
   getBySchedule,
@@ -37,6 +38,16 @@ export const createAppointment = async (req: Request, res: Response) => {
   try {
     const created = await create(req.body);
     return res.status(201).json(createTResult(created));
+  } catch (error: any) {
+    return res.status(400).json(createTResult(null, error.message));
+  }
+};
+
+// ✅ UPDATE
+export const updateAppointment = async (req: Request, res: Response) => {
+  try {
+    const updated = await update(Number(req.params.id), req.body);
+    return res.status(200).json(createTResult(updated));
   } catch (error: any) {
     return res.status(400).json(createTResult(null, error.message));
   }

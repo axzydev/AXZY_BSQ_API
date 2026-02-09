@@ -9,18 +9,19 @@ datasource db {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  name         String
-  lastName     String?
-  email        String        @unique
-  password     String
-  role         Role          @default(USER)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  children     Child[]
-  appointments Appointment[]
-  daySchedules DaySchedule[]
-  evaluations  Evaluation[]
+  id            Int            @id @default(autoincrement())
+  name          String
+  lastName      String?
+  email         String         @unique
+  password      String
+  role          Role           @default(USER)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  children      Child[]
+  appointments  Appointment[]
+  daySchedules  DaySchedule[]
+  evaluations   Evaluation[]
+  notifications Notification[]
 }
 
 enum Role {
@@ -163,4 +164,14 @@ model DevelopmentLog {
   indicator    ProgressIndicator
 
   evaluation Evaluation @relation(fields: [evaluationId], references: [id])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }
