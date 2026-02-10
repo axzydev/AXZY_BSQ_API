@@ -45,36 +45,52 @@ export const create = async (data: any): Promise<Appointment> => {
   if (schedule.modeId !== modeId)
     throw new Error("El modo no coincide con el horario.");
 
-  // 4) validar que el hijo exista
-  const child = await prisma.child.findUnique({
-    where: { id: childId },
-  });
+  // 4) validar hijo (si existe childId)
+  if (childId) {
+    const child = await prisma.child.findUnique({
+      where: { id: childId },
+    });
 
-  if (!child) throw new Error("El hijo no existe.");
+    if (!child) throw new Error("El hijo no existe.");
 
-  // 5) validar que el hijo pertenezca al usuario
-  if (child.userId !== userId)
-    throw new Error("El hijo no pertenece al usuario.");
+    // 5) validar que el hijo pertenezca al usuario
+    if (child.userId !== userId)
+      throw new Error("El hijo no pertenece al usuario.");
 
-  // 6) evitar duplicar al mismo hijo en el mismo horario
-  const duplicate = await prisma.appointment.findFirst({
-    where: {
-      scheduleId,
-      childId,
-    },
-  });
+    // 6) evitar duplicar al mismo hijo en el mismo horario
+    const duplicate = await prisma.appointment.findFirst({
+      where: {
+        scheduleId,
+        childId,
+      },
+    });
 
-  if (duplicate) {
-    throw new Error(
-      `El hijo "${child.name}" ya está registrado en este horario.`
-    );
+    if (duplicate) {
+      throw new Error(
+        `El hijo "${child.name}" ya está registrado en este horario.`
+      );
+    }
+  } else {
+    // Si no hay childId, es el usuario inscribiéndose a sí mismo
+    // Validar que el usuario no esté ya inscrito en ese horario
+    const duplicate = await prisma.appointment.findFirst({
+      where: {
+        scheduleId,
+        userId,
+        childId: null,
+      },
+    });
+
+    if (duplicate) {
+      throw new Error("Ya estás registrado en este horario.");
+    }
   }
 
   // 7) crear cita
   return prisma.appointment.create({
     data: {
       userId,
-      childId,
+      childId: childId || null,
       scheduleId,
       modeId,
     },
@@ -105,17 +121,25 @@ export const update = async (id: number, data: any): Promise<Appointment> => {
       if (schedule.modeId !== targetModeId)
          throw new Error("El modo no coincide con el horario.");
 
-      // Check duplicates (child in same schedule)
-       const duplicate = await prisma.appointment.findFirst({
-        where: {
+      // Check duplicates
+      const whereClause: any = {
           scheduleId,
-          childId: existing.childId,
-          id: { not: id } // Exclude self
-        },
+          id: { not: id }
+      };
+
+      if (existing.childId) {
+          whereClause.childId = existing.childId;
+      } else {
+          whereClause.userId = existing.userId;
+          whereClause.childId = null;
+      }
+
+       const duplicate = await prisma.appointment.findFirst({
+        where: whereClause
       });
 
       if (duplicate) {
-        throw new Error("El hijo ya está registrado en este horario.");
+        throw new Error(existing.childId ? "El hijo ya está registrado en este horario." : "Ya estás registrado en este horario.");
       }
   }
 
@@ -133,7 +157,7 @@ export const remove = async (id: number): Promise<Appointment> => {
   // 1. Get details before delete to notify admins
   const appointment = await prisma.appointment.findUnique({
     where: { id },
-    include: { child: true, schedule: true }
+    include: { child: true, schedule: true, user: true }
   });
 
   if (!appointment) {
@@ -155,7 +179,12 @@ export const remove = async (id: number): Promise<Appointment> => {
 
         const date = new Date(appointment.schedule.date).toLocaleDateString('es-MX'); // or locale
         const time = new Date(appointment.schedule.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const message = `Cita cancelada: ${appointment.child.name} ${appointment.child.lastName || ''} - ${date} ${time}`;
+        
+        const attendeeName = appointment.child 
+            ? `${appointment.child.name} ${appointment.child.lastName || ''}`
+            : `${appointment.user.name} ${appointment.user.lastName || ''}`;
+
+        const message = `Cita cancelada: ${attendeeName} - ${date} ${time}`;
 
         await prisma.notification.createMany({
             data: admins.map(admin => ({

@@ -60,13 +60,13 @@ model DaySchedule {
 model Appointment {
   id         Int      @id @default(autoincrement())
   userId     Int
-  childId    Int
+  childId    Int?
   scheduleId Int
   modeId     Int
   createdAt  DateTime @default(now())
 
   user     User         @relation(fields: [userId], references: [id])
-  child    Child        @relation(fields: [childId], references: [id])
+  child    Child?       @relation(fields: [childId], references: [id])
   schedule DaySchedule  @relation(fields: [scheduleId], references: [id])
   mode     TrainingMode @relation(fields: [modeId], references: [id])
 }

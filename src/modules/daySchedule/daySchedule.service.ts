@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 // GET ALL
 export const get = async (): Promise<DaySchedule[]> => {
   return prisma.daySchedule.findMany({
-    include: { mode: true, coach: true, appointments: { include: { child: true } } },
+    include: { mode: true, coach: true, appointments: { include: { child: true, user: true } } },
     orderBy: [
       { date: "asc" },
       { startTime: "asc" }
@@ -25,7 +25,7 @@ export const getById = async (id: number): Promise<DaySchedule | null> => {
     include: {
       mode: true,
       coach: true,
-      appointments: { include: { child: true } },
+      appointments: { include: { child: true, user: true } },
     },
   });
 };
@@ -102,7 +102,7 @@ export const update = async (id: number, data: any): Promise<DaySchedule> => {
 export const remove = async (id: number): Promise<DaySchedule> => {
   const schedule = await prisma.daySchedule.findUnique({
     where: { id },
-    include: { appointments: { include: { child: true } } },
+    include: { appointments: { include: { child: true, user: true } } },
   });
 
   if (!schedule) {
@@ -188,7 +188,7 @@ export const getAvailable = async (): Promise<any[]> => {
     include: {
       mode: true,
       coach: true,
-      appointments: { include: { child: true } },
+      appointments: { include: { child: true, user: true } },
     },
     orderBy: [
       { date: "asc" },

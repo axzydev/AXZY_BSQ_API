@@ -7,6 +7,9 @@ export const securitySeed = async (prisma: PrismaClient) => {
   const user2 = await user2Seed(prisma);
   await coach1Seed(prisma);
   await coach2Seed(prisma);
+  await XchelRuizSeed(prisma);
+  await GustavoRuizSeed(prisma);
+  await JoseUrbalejoSeed(prisma);
 
   await childrenSeed(prisma, user1.id, user2.id);
 };
@@ -102,6 +105,61 @@ const childrenSeed = async (
       name: "Said Martínez",
       userId: user2Id,
       birthDate: new Date("2008-11-22"),
+    },
+  });
+};
+
+// Xchel Ruiz
+// Gustavo Ruiz
+// Mario Ruiz
+// Jose Urbalejo
+// ---------------------------
+// Xchel Ruiz
+// ---------------------------
+const XchelRuizSeed = async (prisma: PrismaClient) => {
+  const password = await bcrypt.hash("123456", 10);
+
+  return prisma.user.upsert({
+    where: { email: "xchel.ruiz@icloud.com" },
+    update: {},
+    create: {
+      name: "Xchel",
+      lastName: "Ruiz",
+      email: "xchel.ruiz@icloud.com",
+      password,
+      role: "COACH",
+    },
+  });
+};
+
+const GustavoRuizSeed = async (prisma: PrismaClient) => {
+  const password = await bcrypt.hash("123456", 10);
+
+  return prisma.user.upsert({
+    where: { email: "gustavo_baseball@hotmail.com" },
+    update: {},
+    create: {
+      name: "Gustavo",
+      lastName: "Ruiz",
+      email: "gustavo_baseball@hotmail.com",
+      password,
+      role: "COACH",
+    },
+  });
+};
+
+const JoseUrbalejoSeed = async (prisma: PrismaClient) => {
+  const password = await bcrypt.hash("123456", 10);
+
+  return prisma.user.upsert({
+    where: { email: "jurbalejonoriega@gmail.com" },
+    update: {},
+    create: {
+      name: "Jose",
+      lastName: "Urbalejo",
+      email: "jurbalejonoriega@gmail.com",
+      password,
+      role: "COACH",
     },
   });
 };
